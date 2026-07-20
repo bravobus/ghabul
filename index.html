@@ -1,0 +1,370 @@
+```html
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ghabul's | Fine Dining & Culinary Excellence</title>
+    
+    <!-- Tailwind CSS (via CDN for standalone rendering) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Custom Tailwind Configuration -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#c5a059',
+                        secondary: '#1a1a1a',
+                        dark: '#0f0f0f',
+                        light: '#f9f9f9',
+                    },
+                    fontFamily: {
+                        serif: ['"Cormorant Garamond"', 'serif'],
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Custom CSS -->
+    <style>
+        /* Base & Reset */
+        :root {
+            --primary: #c5a059;
+            --secondary: #1a1a1a;
+        }
+        
+        body {
+            background-color: #0f0f0f;
+            color: #f9f9f9;
+            overflow-x: hidden;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f0f0f;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 4px;
+        }
+
+        /* Hero Parallax */
+        .hero-bg {
+            background-image: linear-gradient(to bottom, rgba(15, 15, 15, 0.7), rgba(15, 15, 15, 0.9)), url('https://images.unsplash.com/photo-1514933651103-005eec06c04b?q=80&w=2500&auto=format&fit=crop');
+            background-attachment: fixed;
+            background-position: center;
+            background-size: cover;
+        }
+
+        /* Animations */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease-out;
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Button Hover Effects */
+        .btn-primary {
+            background-color: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--primary);
+            z-index: -1;
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.3s ease;
+        }
+        .btn-primary:hover::before {
+            transform: scaleX(1);
+        }
+        .btn-primary:hover {
+            color: #0f0f0f;
+        }
+
+        /* Menu Tabs */
+        .tab-btn.active {
+            color: var(--primary);
+            border-bottom: 2px solid var(--primary);
+        }
+        
+        .menu-item-card:hover .menu-img {
+            transform: scale(1.1);
+        }
+
+        /* Navbar Transition */
+        .nav-scrolled {
+            background-color: rgba(15, 15, 15, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            padding-top: 1rem !important;
+            padding-bottom: 1rem !important;
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: -100px;
+            right: 20px;
+            background-color: var(--primary);
+            color: #0f0f0f;
+            padding: 16px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: bottom 0.5s ease-in-out;
+            z-index: 9999;
+            box-shadow: 0 10px 25px rgba(197, 160, 89, 0.3);
+        }
+        .toast.show {
+            bottom: 20px;
+        }
+    </style>
+</head>
+<body class="font-sans antialiased selection:bg-primary selection:text-dark">
+
+    <!-- Navigation -->
+    <nav id="navbar" class="fixed w-full z-50 transition-all duration-300 py-6 px-6 lg:px-16 flex justify-between items-center">
+        <a href="#" class="font-serif text-3xl font-bold tracking-wider text-primary">Ghabul's</a>
+        
+        <!-- Desktop Menu -->
+        <div class="hidden md:flex space-x-8 text-sm font-medium tracking-widest uppercase">
+            <a href="#home" class="hover:text-primary transition-colors">Home</a>
+            <a href="#about" class="hover:text-primary transition-colors">About</a>
+            <a href="#menu" class="hover:text-primary transition-colors">Menu</a>
+            <a href="#reviews" class="hover:text-primary transition-colors">Reviews</a>
+            <a href="#contact" class="hover:text-primary transition-colors">Contact</a>
+        </div>
+
+        <div class="hidden md:block">
+            <a href="#reservation" class="btn-primary px-6 py-2 uppercase tracking-widest text-sm font-semibold rounded-sm">Book a Table</a>
+        </div>
+
+        <!-- Mobile Menu Button -->
+        <button id="mobile-menu-btn" class="md:hidden text-primary focus:outline-none">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+        </button>
+    </nav>
+
+    <!-- Mobile Menu Overlay -->
+    <div id="mobile-menu" class="fixed inset-0 bg-dark z-40 transform translate-x-full transition-transform duration-300 flex flex-col justify-center items-center space-y-8">
+        <button id="close-menu-btn" class="absolute top-6 right-6 text-primary">
+            <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+        </button>
+        <a href="#home" class="mobile-link text-2xl font-serif hover:text-primary">Home</a>
+        <a href="#about" class="mobile-link text-2xl font-serif hover:text-primary">About</a>
+        <a href="#menu" class="mobile-link text-2xl font-serif hover:text-primary">Menu</a>
+        <a href="#reviews" class="mobile-link text-2xl font-serif hover:text-primary">Reviews</a>
+        <a href="#contact" class="mobile-link text-2xl font-serif hover:text-primary">Contact</a>
+        <a href="#reservation" class="mobile-link btn-primary px-8 py-3 uppercase tracking-widest text-sm font-semibold rounded-sm mt-4">Book a Table</a>
+    </div>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero-bg h-screen flex flex-col justify-center items-center text-center px-4 relative">
+        <div class="absolute inset-0 bg-black/40"></div>
+        <div class="relative z-10 max-w-4xl mx-auto">
+            <span class="text-primary tracking-[0.3em] uppercase text-sm mb-4 block reveal">Welcome to</span>
+            <h1 class="font-serif text-5xl md:text-7xl lg:text-8xl font-bold mb-6 leading-tight reveal" style="transition-delay: 100ms;">
+                An Exquisite <br> <span class="text-primary italic">Culinary</span> Journey
+            </h1>
+            <p class="text-gray-300 text-lg md:text-xl font-light mb-10 max-w-2xl mx-auto reveal" style="transition-delay: 200ms;">
+                Experience the harmony of flavors, crafted with passion and served with elegance in the heart of the city.
+            </p>
+            <div class="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-6 reveal" style="transition-delay: 300ms;">
+                <a href="#reservation" class="btn-primary px-8 py-4 uppercase tracking-widest text-sm font-semibold rounded-sm w-full sm:w-auto">Make a Reservation</a>
+                <a href="#menu" class="text-white border-b border-transparent hover:border-primary hover:text-primary transition-all pb-1 uppercase tracking-widest text-sm w-full sm:w-auto">Explore Menu</a>
+            </div>
+        </div>
+        
+        <!-- Scroll indicator -->
+        <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce z-10 hidden md:block">
+            <a href="#about" class="text-gray-400 hover:text-primary transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                </svg>
+            </a>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-24 bg-dark px-6 lg:px-16">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <div class="relative reveal">
+                <img src="https://images.unsplash.com/photo-1600891964092-4316c288032e?q=80&w=2000&auto=format&fit=crop" alt="Restaurant Interior" class="w-full h-[500px] object-cover rounded-sm shadow-2xl">
+                <div class="absolute -bottom-8 -right-8 border-4 border-dark w-48 hidden md:block">
+                    <img src="https://images.unsplash.com/photo-1577106263724-2c8e03bfe9cf?q=80&w=1000&auto=format&fit=crop" alt="Chef Cooking" class="w-full h-48 object-cover rounded-sm">
+                </div>
+            </div>
+            
+            <div class="reveal">
+                <div class="flex items-center space-x-4 mb-4">
+                    <div class="h-[1px] w-12 bg-primary"></div>
+                    <span class="text-primary tracking-widest uppercase text-sm font-semibold">Our Story</span>
+                </div>
+                <h2 class="font-serif text-4xl md:text-5xl font-bold mb-6 leading-tight">Tradition meets <br> <span class="italic text-primary">Modern Elegance</span></h2>
+                <p class="text-gray-400 mb-6 leading-relaxed font-light">
+                    Founded with a passion for exceptional gastronomy, Ghabul's brings together the finest ingredients, masterful techniques, and a warm, inviting atmosphere. Our culinary team is dedicated to pushing the boundaries of flavor while respecting timeless traditions.
+                </p>
+                <p class="text-gray-400 mb-10 leading-relaxed font-light">
+                    Whether you are joining us for an intimate dinner, a celebratory feast, or a casual drink at our artisanal bar, we promise an unforgettable experience tailored just for you.
+                </p>
+                
+                <div class="grid grid-cols-2 gap-8 mb-8 border-t border-gray-800 pt-8">
+                    <div>
+                        <h4 class="font-serif text-3xl text-primary mb-2">15+</h4>
+                        <p class="text-sm text-gray-500 uppercase tracking-wider">Years of Excellence</p>
+                    </div>
+                    <div>
+                        <h4 class="font-serif text-3xl text-primary mb-2">50+</h4>
+                        <p class="text-sm text-gray-500 uppercase tracking-wider">Signature Dishes</p>
+                    </div>
+                </div>
+                
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Sig.svg/1024px-Sig.svg.png" alt="Signature" class="w-32 opacity-50 invert filter">
+            </div>
+        </div>
+    </section>
+
+    <!-- Menu Section -->
+    <section id="menu" class="py-24 bg-[#141414] px-6 lg:px-16">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16 reveal">
+                <div class="flex items-center justify-center space-x-4 mb-4">
+                    <div class="h-[1px] w-12 bg-primary"></div>
+                    <span class="text-primary tracking-widest uppercase text-sm font-semibold">Discover</span>
+                    <div class="h-[1px] w-12 bg-primary"></div>
+                </div>
+                <h2 class="font-serif text-4xl md:text-5xl font-bold">Our Curated Menu</h2>
+            </div>
+
+            <!-- Menu Tabs -->
+            <div class="flex flex-wrap justify-center gap-6 mb-12 reveal">
+                <button class="tab-btn active uppercase tracking-widest text-sm font-semibold pb-2" data-target="starters">Starters</button>
+                <button class="tab-btn uppercase tracking-widest text-sm font-semibold pb-2 text-gray-500" data-target="mains">Main Courses</button>
+                <button class="tab-btn uppercase tracking-widest text-sm font-semibold pb-2 text-gray-500" data-target="desserts">Desserts</button>
+                <button class="tab-btn uppercase tracking-widest text-sm font-semibold pb-2 text-gray-500" data-target="drinks">Wines & Drinks</button>
+            </div>
+
+            <!-- Menu Content (Starters) -->
+            <div id="starters" class="menu-content grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10 reveal">
+                <!-- Item -->
+                <div class="flex justify-between items-start border-b border-gray-800 pb-6 group">
+                    <div class="pr-4">
+                        <h3 class="font-serif text-xl font-semibold mb-2 group-hover:text-primary transition-colors">Truffle Arancini</h3>
+                        <p class="text-gray-400 text-sm font-light">Crispy risotto balls, wild mushrooms, mozzarella, truffle aioli.</p>
+                    </div>
+                    <div class="font-serif text-xl text-primary">$18</div>
+                </div>
+                <!-- Item -->
+                <div class="flex justify-between items-start border-b border-gray-800 pb-6 group">
+                    <div class="pr-4">
+                        <h3 class="font-serif text-xl font-semibold mb-2 group-hover:text-primary transition-colors">Wagyu Beef Carpaccio</h3>
+                        <p class="text-gray-400 text-sm font-light">Thinly sliced wagyu, shaved parmesan, capers, extra virgin olive oil.</p>
+                    </div>
+                    <div class="font-serif text-xl text-primary">$24</div>
+                </div>
+                <!-- Item -->
+                <div class="flex justify-between items-start border-b border-gray-800 pb-6 group">
+                    <div class="pr-4">
+                        <h3 class="font-serif text-xl font-semibold mb-2 group-hover:text-primary transition-colors">Seared Scallops</h3>
+                        <p class="text-gray-400 text-sm font-light">Cauliflower purée, crispy pancetta, micro greens, lemon butter.</p>
+                    </div>
+                    <div class="font-serif text-xl text-primary">$22</div>
+                </div>
+                <!-- Item -->
+                <div class="flex justify-between items-start border-b border-gray-800 pb-6 group">
+                    <div class="pr-4">
+                        <h3 class="font-serif text-xl font-semibold mb-2 group-hover:text-primary transition-colors">Burrata Salad</h3>
+                        <p class="text-gray-400 text-sm font-light">Fresh burrata, heirloom tomatoes, basil pesto, balsamic glaze.</p>
+                    </div>
+                    <div class="font-serif text-xl text-primary">$19</div>
+                </div>
+                <!-- Item -->
+                <div class="flex justify-between items-start border-b border-gray-800 pb-6 group">
+                    <div class="pr-4">
+                        <h3 class="font-serif text-xl font-semibold mb-2 group-hover:text-primary transition-colors">Oysters Rockefeller</h3>
+                        <p class="text-gray-400 text-sm font-light">Half dozen oysters, spinach, butter, breadcrumbs, pernod.</p>
+                    </div>
+                    <div class="font-serif text-xl text-primary">$26</div>
+                </div>
+                <!-- Item -->
+                <div class="flex justify-between items-start border-b border-gray-800 pb-6 group">
+                    <div class="pr-4">
+                        <h3 class="font-serif text-xl font-semibold mb-2 group-hover:text-primary transition-colors">Lobster Bisque</h3>
+                        <p class="text-gray-400 text-sm font-light">Rich cream soup, Maine lobster chunks, chives, crostini.</p>
+                    </div>
+                    <div class="font-serif text-xl text-primary">$16</div>
+                </div>
+            </div>
+
+            <!-- Menu Content (Mains - Hidden by default) -->
+            <div id="mains" class="menu-content hidden grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10">
+                <div class="flex justify-between items-start border-b border-gray-800 pb-6 group">
+                    <div class="pr-4">
+                        <h3 class="font-serif text-xl font-semibold mb-2 group-hover:text-primary transition-colors">Filet Mignon</h3>
+                        <p class="text-gray-400 text-sm font-light">8oz center cut, potato gratin, asparagus, red wine reduction.</p>
+                    </div>
+                    <div class="font-serif text-xl text-primary">$54</div>
+                </div>
+                <div class="flex justify-between items-start border-b border-gray-800 pb-6 group">
+                    <div class="pr-4">
+                        <h3 class="font-serif text-xl font-semibold mb-2 group-hover:text-primary transition-colors">Pan-Roasted Chilean Sea Bass</h3>
+                        <p class="text-gray-400 text-sm font-light">Miso glaze, baby bok choy, ginger-soy broth, shiitake mushrooms.</p>
+                    </div>
+                    <div class="font-serif text-xl text-primary">$48</div>
+                </div>
+                <div class="flex justify-between items-start border-b border-gray-800 pb-6 group">
+                    <div class="pr-4">
+                        <h3 class="font-serif text-xl font-semibold mb-2 group-hover:text-primary transition-colors">Duck Confit</h3>
+                        <p class="text-gray-400 text-sm font-light">Slow-cooked duck leg, sweet potato puree, cherry gastrique.</p>
+                    </div>
+                    <div class="font-serif text-xl text-primary">$42</div>
+                </div>
+                <div class="flex justify-between items-start border-b border-gray-800 pb-6 group">
+                    <div class="pr-4">
+                        <h3 class="font-serif text-xl font-semibold mb-2 group-hover:text-primary transition-colors">Truffle Mushroom Risotto</h3>
+                        <p class="text-gray-400 text-sm font-light">Arborio rice, wild mushrooms, parmesan, fresh black truffle shavings.</p>
+                    </div>
+                    <div class="font-serif text-xl text-primary">$36</div>
+                </div>
+                <div class="flex justify-between items-start border-b border-gray-800 pb-6 group">
+                    <div class="pr-4">
+                        <h3 class="font-serif text-xl font-semibold mb-2 group-hover:text-primary transition-colors">Herb-Crusted Rack of Lamb</h3>
+                        <p class="text-gray-400 text-sm font-light">Provencal herbs, ratatouille, mint infused au jus.</p>
+                    </div>
+                    <div class="font-serif text-xl text-primary">$52</div>
+                </div>
+                <div class="flex justify-between items-start border-b border-gray-800 pb-6 group">
+                    <div class="pr-4">
+                        <h3 class="font-serif text-xl font-semibold mb-2 group-hover:text-primary transition-colors">Maine Lobster Tail</h3>
+               
